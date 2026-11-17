@@ -8,12 +8,12 @@
 :root{
   --bg:#f5f6f8;--card:#fff;--ink:#1c2230;--muted:#5d6678;--line:#dde1e8;--soft:#eef1f5;
   --accent:#1f5fbf;--accent-ink:#fff;--ok:#18794e;--ok-bg:#e3f4ea;--warn:#8a5a00;--warn-bg:#fdf1d8;
-  --err:#b42318;--err-bg:#fde8e7;--cbs:#1f5fbf;--ibs:#0f7b6c;--is:#8b3fb8;
+  --err:#b42318;--err-bg:#fde8e7;--cbs:#1f5fbf;--ibs:#0f7b6c;--is:#8b3fb8;--old:#7a5c2e;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12151b;--card:#1b2029;--ink:#e6e9ef;--muted:#9aa3b5;--line:#2c3340;--soft:#232a35;
   --accent:#5b93f0;--accent-ink:#0b1220;--ok:#5fd09a;--ok-bg:#16301f;--warn:#f0bf5a;--warn-bg:#3a2d10;
-  --err:#ff8a80;--err-bg:#3d1a18;--cbs:#7aa8f5;--ibs:#4fc9b6;--is:#c38be6;}}
+  --err:#ff8a80;--err-bg:#3d1a18;--cbs:#7aa8f5;--ibs:#4fc9b6;--is:#c38be6;--old:#d9b77c;}}
 *{box-sizing:border-box}
 [hidden]{display:none !important}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
@@ -33,15 +33,24 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .hint.bad{color:var(--err)}
 button{font:inherit;font-size:14px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;cursor:pointer}
 button:hover{background:var(--soft)}
+button:disabled{opacity:.5;cursor:default}
 button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 button.primary:hover{filter:brightness(1.07)}
 button.link{border:none;background:none;color:var(--accent);padding:4px 6px}
 button.danger{color:var(--err)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .spacer{flex:1}
+.start{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.opt{border:1.5px dashed var(--line);border-radius:10px;padding:16px;text-align:left;background:var(--soft);display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.opt:hover,.opt.drag{border-color:var(--accent)}
+.opt b{font-size:15px}
+.opt span{font-size:13px;color:var(--muted)}
+.nota{display:grid;gap:4px 16px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));font-size:13.5px;margin-top:12px}
+.nota div span{color:var(--muted)}
 .item{border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:12px;background:var(--soft)}
-.item-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.item-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .item-head strong{font-size:14.5px}
+.item-desc{font-size:13px;color:var(--muted);margin:-4px 0 10px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
 .seg button{border:none;border-radius:0;padding:6px 12px;font-size:13px}
 .seg button.on{background:var(--accent);color:var(--accent-ink)}
@@ -52,16 +61,22 @@ button.danger{color:var(--err)}
 .notice.warn{background:var(--warn-bg);color:var(--warn)}
 .notice.err{background:var(--err-bg);color:var(--err)}
 .notice.info{background:var(--soft);color:var(--muted)}
+.notice ul{margin:4px 0 0;padding-left:18px}
 .tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:16px}
 .tile{border:1px solid var(--line);border-radius:9px;padding:12px;background:var(--card)}
 .tile .k{font-size:12.5px;color:var(--muted);font-weight:600}
 .tile .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12.5px;color:var(--muted);margin-top:2px}
 .tile.cbs{border-left:4px solid var(--cbs)}.tile.ibs{border-left:4px solid var(--ibs)}.tile.is{border-left:4px solid var(--is)}
-.tile.total{border-left:4px solid var(--ink)}
+.tile.total{border-left:4px solid var(--ink)}.tile.old{border-left:4px solid var(--old)}
+.compare{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-bottom:16px}
+.compare .tile .v{font-size:26px}
+.up{color:var(--err)}.down{color:var(--ok)}
 table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
 th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
 th{font-size:12px;color:var(--muted);font-weight:600}
+tfoot td{font-weight:700}
 .tbl{overflow-x:auto}
 .badge{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px}
 .badge.ok{background:var(--ok-bg);color:var(--ok)}
@@ -77,28 +92,49 @@ summary{cursor:pointer;color:var(--accent);font-size:13.5px}
 pre{background:var(--soft);padding:10px;border-radius:8px;overflow:auto;font-size:12px;max-height:360px}
 .muted{color:var(--muted)}
 .loading{opacity:.55;pointer-events:none}
-@media (max-width:600px){.grid{grid-template-columns:1fr 1fr}.tile .v{font-size:18px}}
+@media (max-width:600px){.grid{grid-template-columns:1fr 1fr}.tile .v{font-size:18px}.compare{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <h1>Simulador CBS / IBS / Imposto Seletivo<small>Reforma Tributária do Consumo (LC 214/2025), regime regular. Usa a calculadora oficial rodando neste computador.</small></h1>
   <div class="row">
-    <button class="link" id="btnExemplo" type="button">Carregar exemplo</button>
-    <button class="link" id="btnLimpar" type="button">Limpar</button>
-    <a href="swagger-ui/index.html" target="_blank" class="link" style="color:var(--accent);font-size:14px">Swagger (avançado)</a>
+    <button class="link" id="btnLimpar" type="button">Começar de novo</button>
+    <a href="swagger-ui/index.html" target="_blank" style="color:var(--accent);font-size:14px">Swagger (avançado)</a>
   </div>
 </div></header>
 
 <main class="wrap">
   <div id="msgApi"></div>
 
-  <section class="card">
-    <h2>1. Dados da operação</h2>
+  <section class="card" id="inicio">
+    <h2>Como você quer começar?</h2>
+    <div class="start">
+      <label class="opt" id="dropZone" for="arqXml">
+        <b>📄 Importar XML de uma NF-e</b>
+        <span>Escolha (ou arraste aqui) o XML de uma nota real. A tela preenche os itens e compara os tributos de hoje com CBS/IBS/IS.</span>
+        <input type="file" id="arqXml" accept=".xml,text/xml,application/xml" hidden>
+      </label>
+      <button class="opt" type="button" id="btnManual"><b>✏️ Preencher manualmente</b><span>Monte uma operação do zero, item por item.</span></button>
+      <button class="opt" type="button" id="btnExemplo"><b>🔎 Ver um exemplo</b><span>Arroz da cesta básica, cerveja com Imposto Seletivo e serviço de educação.</span></button>
+    </div>
+    <div id="notaInfo"></div>
+  </section>
+
+  <section class="card" id="secOperacao" hidden>
+    <h2>1. Cenário e local da operação</h2>
+    <div class="row" style="margin-bottom:12px">
+      <span class="muted" style="font-size:13px">Simular em:</span>
+      <div class="seg" id="cenarios">
+        <button type="button" data-ano="2026">2026 · fase de teste</button>
+        <button type="button" data-ano="2027">2027 · CBS cheia</button>
+        <button type="button" data-ano="2033">2033 · reforma completa</button>
+      </div>
+    </div>
     <div class="grid">
       <div><label for="data">Data do fato gerador</label><input type="date" id="data"></div>
       <div><label for="uf">UF</label><select id="uf"><option>Carregando…</option></select></div>
-      <div style="grid-column:span 2"><label for="mun">Município</label><select id="mun"><option value="">Escolha a UF</option></select></div>
+      <div style="grid-column:span 2"><label for="mun">Município (local da operação / destino)</label><select id="mun"><option value="">Escolha a UF</option></select><div class="hint" id="munHint"></div></div>
     </div>
     <div id="aliqBox" style="margin-top:14px">
       <div class="notice info" id="aliqInfo"></div>
@@ -110,8 +146,9 @@ pre{background:var(--soft);padding:10px;border-radius:8px;overflow:auto;font-siz
     </div>
   </section>
 
-  <section class="card">
+  <section class="card" id="secItens" hidden>
     <div class="row" style="margin-bottom:12px"><h2 style="margin:0">2. Itens</h2><span class="spacer"></span><button type="button" id="btnAdd">+ Adicionar item</button></div>
+    <div id="revisao"></div>
     <div id="itens"></div>
     <div class="row" style="margin-top:6px">
       <button class="primary" type="button" id="btnCalcular">Calcular tributos</button>
@@ -121,10 +158,11 @@ pre{background:var(--soft);padding:10px;border-radius:8px;overflow:auto;font-siz
 
   <section class="card" id="resultado" hidden>
     <div class="row" style="margin-bottom:12px"><h2 style="margin:0">3. Resultado</h2><span class="spacer"></span>
-      <button type="button" id="btnXml">Baixar XML (NF-e)</button>
+      <button type="button" id="btnXml">Baixar XML (grupo IBS/CBS)</button>
       <button type="button" id="btnJson">Baixar JSON do resultado</button>
     </div>
     <div id="resAviso"></div>
+    <div id="comparativo"></div>
     <div class="tiles" id="tiles"></div>
     <div class="tbl" id="tabela"></div>
     <h2 style="margin-top:18px">Detalhe por item</h2>
@@ -141,6 +179,8 @@ pre{background:var(--soft);padding:10px;border-radius:8px;overflow:auto;font-siz
       <span class="spacer"></span>
       <button type="button" class="link danger rm">Remover</button>
     </div>
+    <div class="item-desc"></div>
+    <div class="flags"></div>
     <div class="grid">
       <div><label class="lblCod">NCM</label><input class="cod" inputmode="numeric" placeholder="ex.: 10063021"><div class="hint codHint"></div></div>
       <div style="grid-column:span 2"><label>CST (situação tributária)</label><select class="cst"></select></div>
@@ -166,34 +206,52 @@ pre{background:var(--soft);padding:10px;border-radius:8px;overflow:auto;font-siz
 <script>
 const API = 'calculadora';
 const $ = s => document.querySelector(s);
-const fmt = v => (v === undefined || v === null || v === '') ? '—' : Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt = v => (v === undefined || v === null || v === '' || isNaN(v)) ? '—' : Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtPct = v => (v === undefined || v === null || v === '') ? '—' : Number(v).toLocaleString('pt-BR',{maximumFractionDigits:4}) + '%';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const num = v => v === '' || v === null || v === undefined ? undefined : Number(v);
+const r2 = v => Math.round((Number(v)||0)*100)/100;
 
-let cstLista = [], cclDetalhe = {}, isCstLista = [], isCclCache = {};
-let ultimaEntrada = null, ultimaResposta = null;
+/* Alíquotas nominais sugeridas por cenário. 2027: CBS cheia + IBS de teste (0,1%).
+   2033: estimativa de referência (CBS 8,8% + IBS 17,7%), pois a lei ainda não fixou os valores. */
+const CENARIOS = {
+  2026: { data:'2026-06-01', aliq:null },
+  2027: { data:'2027-01-15', aliq:[8.8,0.05,0.05] },
+  2033: { data:'2033-01-15', aliq:[8.8,10.0,7.7] }
+};
+/* cClassTrib "gerais" (sem condição especial de comprador/local) vinculadas a listas de NCM. */
+const CCL_SUGERIVEIS = ['200003','200014','200034','200036','200035','200013','200009','200053','200032','200004','200030','200007','200031','200033'];
+const CCL_ALERTA = { '620001':'Combustível sujeito à tributação monofásica (cClassTrib 620001). Revise CST/cClassTrib e as alíquotas ad rem.' };
+
+let cstLista = [], cclDetalhe = {}, cclParaCst = {}, isCstLista = [], isCclCache = {};
+let ultimaEntrada = null, ultimaResposta = null, notaAtual = null;
 
 async function get(path){
   const r = await fetch(`${API}/${path}`);
-  if (!r.ok) throw Object.assign(new Error('HTTP '+r.status), {status:r.status, body: await r.text().catch(()=>'')});
+  if (!r.ok) throw Object.assign(new Error('HTTP '+r.status), {status:r.status});
   return r.json();
+}
+async function post(path, body){
+  const r = await fetch(`${API}/${path}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  const t = await r.text(); let j; try{ j = JSON.parse(t);}catch{ j = {detail:t}; }
+  return {ok:r.ok, status:r.status, body:j, headers:r.headers};
 }
 function dataISO(){ return $('#data').value || new Date().toISOString().slice(0,10); }
 function ano(){ return Number(dataISO().slice(0,4)); }
+function mostrarFormulario(){ ['#secOperacao','#secItens'].forEach(s=>$(s).hidden=false); }
 
-/* ---------- carga de tabelas ---------- */
+/* ---------- tabelas ---------- */
 async function carregarUfs(){
   const ufs = await get('dados-abertos/ufs');
   ufs.sort((a,b)=>a.sigla.localeCompare(b.sigla));
-  $('#uf').innerHTML = ufs.map(u=>`<option value="${u.sigla}">${u.sigla} – ${esc(u.nome)}</option>`).join('');
+  $('#uf').innerHTML = '<option value="">Escolha…</option>' + ufs.map(u=>`<option value="${u.sigla}">${u.sigla} – ${esc(u.nome)}</option>`).join('');
 }
 async function carregarMunicipios(sel){
-  const uf = $('#uf').value; if(!uf) return;
+  const uf = $('#uf').value; if(!uf){ $('#mun').innerHTML='<option value="">Escolha a UF</option>'; return; }
   $('#mun').innerHTML = '<option>Carregando…</option>';
   const ms = await get('dados-abertos/ufs/municipios?siglaUf='+uf);
   $('#mun').innerHTML = ms.map(m=>`<option value="${m.codigo}">${esc(m.nome)} (${m.codigo})</option>`).join('');
-  if (sel) $('#mun').value = sel;
+  if (sel) $('#mun').value = String(sel);
 }
 async function carregarClassificacoes(){
   const d = dataISO();
@@ -203,7 +261,9 @@ async function carregarClassificacoes(){
       get('dados-abertos/classificacoes-tributarias/cbs-ibs?data='+d),
       get('dados-abertos/situacoes-tributarias/imposto-seletivo?data='+d).catch(()=>[])
     ]);
-    cstLista = csts; cclDetalhe = {}; det.forEach(c=>cclDetalhe[c.codigo]=c);
+    cstLista = csts; cclDetalhe = {}; cclParaCst = {};
+    det.forEach(c=>cclDetalhe[c.codigo]=c);
+    csts.forEach(s=>s.classificacoesTributarias.forEach(c=>cclParaCst[c.codigo]=s.codigo));
     isCstLista = isCsts; isCclCache = {};
     document.querySelectorAll('#itens .item').forEach(el=>preencherCst(el));
     $('#msgApi').innerHTML='';
@@ -214,22 +274,29 @@ async function carregarClassificacoes(){
 
 /* ---------- itens ---------- */
 function preencherCst(el){
-  const cst = el.querySelector('.cst'), atual = cst.value || el.dataset.cst || '000';
+  const cst = el.querySelector('.cst'), atual = el.dataset.cst || cst.value || '000';
   cst.innerHTML = cstLista.map(c=>`<option value="${c.codigo}">${c.codigo} – ${esc(c.descricao)}</option>`).join('');
   cst.value = cstLista.some(c=>c.codigo===atual) ? atual : (cstLista[0]?.codigo||'');
+  el.dataset.cst = '';
   preencherCcl(el);
-  const isc = el.querySelector('.isCst'), isAtual = isc.value || el.dataset.isCst || '000';
+  const isc = el.querySelector('.isCst'), isAtual = el.dataset.isCst || isc.value || '000';
   isc.innerHTML = isCstLista.map(c=>`<option value="${c.codigo}">${c.codigo} – ${esc(c.descricao)}</option>`).join('');
   isc.value = isCstLista.some(c=>c.codigo===isAtual) ? isAtual : (isCstLista[0]?.codigo||'');
+  el.dataset.isCst = '';
   preencherIsCcl(el);
 }
 function preencherCcl(el){
   const cst = el.querySelector('.cst').value, sel = el.querySelector('.ccl');
-  const atual = sel.value || el.dataset.ccl;
+  const atual = el.dataset.ccl || sel.value;
   const lista = (cstLista.find(c=>c.codigo===cst)?.classificacoesTributarias)||[];
   sel.innerHTML = lista.map(c=>`<option value="${c.codigo}">${c.codigo} – ${esc(c.descricao)}</option>`).join('');
   if (lista.some(c=>c.codigo===atual)) sel.value = atual;
   el.dataset.ccl = ''; mostrarCcl(el);
+}
+function setClass(el, ccl){
+  el.dataset.cst = cclParaCst[ccl] || '000'; el.dataset.ccl = ccl;
+  const cst = el.querySelector('.cst'); cst.value = el.dataset.cst; el.dataset.cst='';
+  preencherCcl(el);
 }
 function mostrarCcl(el){
   const c = cclDetalhe[el.querySelector('.ccl').value];
@@ -237,7 +304,7 @@ function mostrarCcl(el){
 }
 async function preencherIsCcl(el){
   const cst = el.querySelector('.isCst').value, sel = el.querySelector('.isCcl');
-  const atual = sel.value || el.dataset.isCcl;
+  const atual = el.dataset.isCcl || sel.value;
   if (!cst){ sel.innerHTML=''; return; }
   if (!isCclCache[cst]) isCclCache[cst] = await get(`dados-abertos/classificacoes-tributarias/imposto-seletivo/${cst}?data=${dataISO()}`).catch(()=>[]);
   sel.innerHTML = isCclCache[cst].map(c=>`<option value="${c.codigo}">${c.codigo} – ${esc(c.descricao)}</option>`).join('');
@@ -251,29 +318,42 @@ function setTipo(el, tipo){
   el.querySelector('.cod').placeholder = tipo==='ncm' ? 'ex.: 10063021' : 'ex.: 122011200';
   consultarCodigo(el);
 }
+const infoCodCache = {};
+async function infoCodigo(tipo, cod){
+  const k = tipo+cod+dataISO();
+  if (!(k in infoCodCache)) infoCodCache[k] = get(`dados-abertos/${tipo}?${tipo}=${cod}&data=${dataISO()}`).catch(()=>null);
+  return infoCodCache[k];
+}
 let tmrCod;
 async function consultarCodigo(el){
   const cod = el.querySelector('.cod').value.replace(/\D/g,''), h = el.querySelector('.codHint');
   h.classList.remove('bad');
   if (!cod){ h.textContent=''; return; }
-  try{
-    const r = await get(`dados-abertos/${el.dataset.tipo}?${el.dataset.tipo}=${cod}&data=${dataISO()}`);
-    h.textContent = [r.capitulo, r.posicao, r.subitem, r.item].filter(Boolean).pop() || 'Código encontrado';
-    if (r.tributadoPeloImpostoSeletivo) h.textContent += ' · sujeito ao IS';
-  }catch(e){ h.textContent = 'Código não encontrado na tabela'; h.classList.add('bad'); }
+  const r = await infoCodigo(el.dataset.tipo, cod);
+  if (!r){ h.textContent = 'Código não encontrado na tabela'; h.classList.add('bad'); return; }
+  h.textContent = [r.capitulo, r.posicao, r.subitem, r.item].filter(Boolean).pop() || 'Código encontrado';
+  if (r.tributadoPeloImpostoSeletivo) h.textContent += ' · sujeito ao IS';
 }
 function numerar(){ document.querySelectorAll('#itens .item').forEach((el,i)=>el.querySelector('.titulo').textContent='Item '+(i+1)); }
+function mostrarFlags(el){
+  const f = JSON.parse(el.dataset.flags||'[]');
+  el.querySelector('.flags').innerHTML = f.length ? `<div class="notice warn"><b>Revise:</b><ul>${f.map(x=>'<li>'+x+'</li>').join('')}</ul></div>` : '';
+}
 function addItem(v={}){
   const el = $('#tplItem').content.firstElementChild.cloneNode(true);
   el.dataset.tipo = v.nbs ? 'nbs' : 'ncm';
   el.dataset.cst = v.cst||''; el.dataset.ccl = v.cClassTrib||'';
+  if (v.nota) el.dataset.nota = JSON.stringify(v.nota);
+  el.dataset.flags = JSON.stringify(v.flags||[]);
+  el.querySelector('.item-desc').textContent = v.nota ? `${v.nota.xProd} · CFOP ${v.nota.cfop} · valor na nota R$ ${fmt(v.nota.vProd)}` : '';
+  el.querySelector('.item-desc').hidden = !v.nota;
   el.querySelector('.cod').value = v.ncm || v.nbs || '';
   el.querySelector('.base').value = v.baseCalculo ?? '';
   el.querySelector('.qtd').value = v.quantidade ?? '';
   el.querySelector('.un').value = v.unidade ?? '';
   if (v.is){
     el.querySelector('.temIs').checked = true; el.querySelector('.isCampos').hidden = false;
-    el.dataset.isCst = v.is.cst; el.dataset.isCcl = v.is.cClassTrib;
+    el.dataset.isCst = v.is.cst||''; el.dataset.isCcl = v.is.cClassTrib||'';
     el.querySelector('.isBase').value = v.is.baseCalculo ?? '';
     el.querySelector('.isAliq').value = v.is.adValorem ?? '';
     el.querySelector('.isAdRem').value = v.is.adRem ?? '';
@@ -286,23 +366,189 @@ function addItem(v={}){
   el.querySelector('.isCst').onchange=()=>{ preencherIsCcl(el); salvar(); };
   el.querySelector('.temIs').onchange=e=>{ el.querySelector('.isCampos').hidden=!e.target.checked; atualizarBaseHint(el); salvar(); };
   el.querySelector('.cod').oninput=()=>{ clearTimeout(tmrCod); tmrCod=setTimeout(()=>consultarCodigo(el),400); };
-  el.addEventListener('input', ()=>{ atualizarBaseHint(el); salvar(); });
+  el.querySelector('.base').addEventListener('input', ()=>{ el.dataset.baseManual='1'; });
+  el.addEventListener('input', ()=>{ salvar(); });
   $('#itens').appendChild(el);
-  setTipo(el, el.dataset.tipo); preencherCst(el); atualizarBaseHint(el); numerar(); atualizarAliqUI();
+  setTipo(el, el.dataset.tipo); preencherCst(el); mostrarFlags(el); atualizarBaseHint(el); numerar(); atualizarAliqUI();
+  return el;
 }
 function atualizarBaseHint(el){
-  const temIs = el.querySelector('.temIs').checked;
-  el.querySelector('.baseHint').textContent = temIs ? 'Pode deixar em branco: a calculadora usa base do IS + IS' : '';
+  const h = el.querySelector('.baseHint');
+  if (el.dataset.baseTxt) { h.textContent = el.dataset.baseTxt; return; }
+  h.textContent = el.querySelector('.temIs').checked ? 'Pode deixar em branco: a calculadora usa base do IS + IS' : '';
 }
 
-/* ---------- alíquotas por ano ---------- */
+/* ---------- cenário / alíquotas ---------- */
 function atualizarAliqUI(){
   const a = ano(), exige = a >= 2027;
   $('#aliqCampos').hidden = !exige;
   document.querySelectorAll('.isAliqWrap').forEach(w=>w.hidden=!exige);
+  document.querySelectorAll('#cenarios button').forEach(b=>b.classList.toggle('on', Number(b.dataset.ano)===a));
   $('#aliqInfo').innerHTML = exige
-    ? `Para ${a} a lei ainda não fixou as alíquotas definitivas, então a calculadora exige que você informe as alíquotas nominais. O resultado sai como <b>simulado</b>.`
+    ? `Para ${a} a lei ainda não fixou as alíquotas, então a calculadora exige que você as informe e o resultado sai como <b>simulado</b>.${a>=2033?' Os valores sugeridos (CBS 8,8% + IBS 17,7%) são a estimativa de referência do governo; ajuste se quiser.':''}`
     : `Em ${a} a calculadora usa as alíquotas de teste oficiais (CBS 0,9% e IBS 0,1%). Não é preciso informar alíquotas.`;
+}
+async function aplicarCenario(a){
+  const c = CENARIOS[a];
+  $('#data').value = c.data;
+  if (c.aliq) [$('#aCbs').value,$('#aIbsUf').value,$('#aIbsMun').value] = c.aliq;
+  atualizarAliqUI();
+  await carregarClassificacoes();
+  await recalcularBasesNota();
+  salvar();
+}
+
+/* ---------- importação de NF-e ---------- */
+function lerNfe(texto){
+  const doc = new DOMParser().parseFromString(texto, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('o arquivo não é um XML válido');
+  const T = (n, ctx=doc) => ctx ? ctx.getElementsByTagNameNS('*', n)[0] : undefined;
+  const tx = (n, ctx) => (T(n, ctx)?.textContent || '').trim();
+  const nv = (n, ctx) => Number(tx(n, ctx)) || 0;
+  const inf = T('infNFe');
+  if (!inf) throw new Error('não encontrei o grupo infNFe. Este arquivo é uma NF-e ou NFC-e?');
+  const ide = T('ide', inf), emit = T('emit', inf), dest = T('dest', inf);
+  const eEmit = T('enderEmit', emit), eDest = dest ? T('enderDest', dest) : null;
+  const nota = {
+    chave: (inf.getAttribute('Id')||'').replace(/^NFe/,''),
+    numero: tx('nNF', ide), serie: tx('serie', ide), modelo: tx('mod', ide),
+    emissao: (tx('dhEmi', ide) || tx('dEmi', ide)).slice(0,10),
+    natOp: tx('natOp', ide), idDest: tx('idDest', ide),
+    emitente: tx('xNome', emit), ufEmit: tx('UF', eEmit), munEmit: tx('cMun', eEmit), crt: tx('CRT', emit),
+    destinatario: dest ? tx('xNome', dest) : '', ufDest: eDest ? tx('UF', eDest) : '', munDest: eDest ? tx('cMun', eDest) : '',
+    itens: []
+  };
+  const dets = inf.getElementsByTagNameNS('*', 'det');
+  for (const det of dets){
+    const prod = T('prod', det), imp = T('imposto', det);
+    const icms = T('ICMS', imp), pis = T('PIS', imp), cof = T('COFINS', imp), ipi = T('IPI', imp), iss = T('ISSQN', imp), ufd = T('ICMSUFDest', imp);
+    nota.itens.push({
+      nItem: det.getAttribute('nItem'), cProd: tx('cProd', prod), xProd: tx('xProd', prod),
+      ncm: tx('NCM', prod), cfop: tx('CFOP', prod), uCom: tx('uCom', prod), qCom: nv('qCom', prod),
+      vProd: nv('vProd', prod), vFrete: nv('vFrete', prod), vSeg: nv('vSeg', prod), vDesc: nv('vDesc', prod), vOutro: nv('vOutro', prod),
+      vICMS: icms ? nv('vICMS', icms) : 0, vICMSST: icms ? nv('vICMSST', icms) : 0,
+      vFCP: icms ? nv('vFCP', icms) : 0, vFCPST: icms ? nv('vFCPST', icms) : 0,
+      vICMSUFDest: ufd ? nv('vICMSUFDest', ufd) : 0, vFCPUFDest: ufd ? nv('vFCPUFDest', ufd) : 0,
+      vICMSMono: icms ? nv('vICMSMono', icms) : 0,
+      vPIS: pis ? nv('vPIS', pis) : 0, vCOFINS: cof ? nv('vCOFINS', cof) : 0, vIPI: ipi ? nv('vIPI', ipi) : 0,
+      vISSQN: iss ? nv('vISSQN', iss) : 0
+    });
+  }
+  if (!nota.itens.length) throw new Error('a nota não tem itens (det)');
+  return nota;
+}
+const tributosAtuais = n => r2(n.vICMS + n.vICMSST + n.vFCP + n.vFCPST + n.vICMSUFDest + n.vFCPUFDest + n.vICMSMono + n.vPIS + n.vCOFINS + n.vIPI + n.vISSQN);
+
+const aplicavelCache = {};
+async function sugerirClassificacao(ncm){
+  if (!ncm || ncm.length !== 8) return [];
+  const d = dataISO(), k = ncm+d;
+  const testar = (n) => Promise.all([...CCL_SUGERIVEIS, ...Object.keys(CCL_ALERTA)].filter(c=>cclDetalhe[c]).map(c =>
+      get(`dados-abertos/classificacoes-tributarias/ncm-aplicavel?cClassTrib=${c}&ncm=${n}&dataOcorrenciaFatoGerador=${d}`)
+        .then(r => r.valido ? c : null).catch(()=>null))).then(l=>l.filter(Boolean));
+  /* Classificações sem lista fechada de NCM aceitam qualquer código; descubro quais são testando
+     uma NCM de controle (armas de guerra, 93011000) e descarto essas da sugestão. */
+  const kc = 'controle'+d;
+  if (!aplicavelCache[kc]) aplicavelCache[kc] = testar('93011000');
+  if (!aplicavelCache[k]) aplicavelCache[k] = Promise.all([testar(ncm), aplicavelCache[kc]]).then(([l, univ]) => l.filter(c => !univ.includes(c)));
+  return aplicavelCache[k];
+}
+function flagsCfop(cfop){
+  const f = [];
+  if (/^7/.test(cfop)) f.push(`CFOP ${cfop} é de exportação: em regra é imune/suspensa de CBS/IBS. Escolha a classificação adequada.`);
+  else if (/^[56]9/.test(cfop)) f.push(`CFOP ${cfop} é de remessa/retorno/outra saída (não é venda). Pode não haver incidência ou ter tratamento próprio.`);
+  else if (/^[56](15|55)/.test(cfop)) f.push(`CFOP ${cfop} é de transferência entre estabelecimentos. Confira se há incidência.`);
+  else if (/^[56]2/.test(cfop) || /^[12]/.test(cfop)) f.push(`CFOP ${cfop} é de entrada ou devolução. A calculadora simula a saída; confira o tratamento.`);
+  return f;
+}
+async function baseDaNota(n, ano){
+  const r = await post('base-calculo/base-calculo-unificada', {
+    anoFatoGerador: ano, tipoDocumento: notaAtual?.modelo === '65' ? 65 : 55, natureza: n.vISSQN ? 'servico' : 'bem',
+    vProd:n.vProd, vFrete:n.vFrete, vSeg:n.vSeg, vOutro:n.vOutro, vDesc:n.vDesc,
+    vPIS:n.vPIS, vCOFINS:n.vCOFINS, vICMS:n.vICMS, vFCP:n.vFCP, vICMSUFDest:n.vICMSUFDest, vFCPUFDest:n.vFCPUFDest,
+    vICMSMono:n.vICMSMono, vISSQN:n.vISSQN || undefined
+  });
+  if (!r.ok) return { base: r2(n.vProd + n.vFrete + n.vSeg + n.vOutro - n.vDesc), txt: 'Base = valor do item (a calculadora não montou a base unificada)' };
+  const ded = [];
+  if (n.vDesc) ded.push('desconto');
+  if (ano <= 2032 && (n.vICMS||n.vFCP||n.vICMSUFDest)) ded.push('ICMS/FCP');
+  if (ano <= 2026 && (n.vPIS||n.vCOFINS)) ded.push('PIS/COFINS');
+  if (ano <= 2032 && n.vISSQN) ded.push('ISS');
+  return { base: r2(r.body.baseRG), txt: `Base oficial ${ano}: valor${n.vFrete||n.vSeg||n.vOutro?' + frete/seguro/outras':''}${ded.length?' − '+ded.join(', '):''}` };
+}
+async function recalcularBasesNota(){
+  const a = ano();
+  for (const el of document.querySelectorAll('#itens .item')){
+    if (!el.dataset.nota || el.dataset.baseManual) continue;
+    const {base, txt} = await baseDaNota(JSON.parse(el.dataset.nota), a);
+    el.querySelector('.base').value = base; el.dataset.baseTxt = txt; atualizarBaseHint(el);
+  }
+}
+async function importarArquivo(arq){
+  if (!arq) return;
+  $('#status').textContent = '';
+  $('#notaInfo').innerHTML = `<div class="notice info" style="margin-top:12px">Lendo ${esc(arq.name)}…</div>`;
+  let nota;
+  try { nota = lerNfe(await arq.text()); }
+  catch(e){ $('#notaInfo').innerHTML = `<div class="notice err" style="margin-top:12px">Não consegui ler a nota: ${esc(e.message)}</div>`; return; }
+  notaAtual = nota;
+  document.body.classList.add('loading');
+  try{
+    mostrarFormulario(); $('#resultado').hidden = true;
+    const usaDest = nota.munDest && nota.idDest !== '3';
+    const uf = usaDest ? nota.ufDest : nota.ufEmit, mun = usaDest ? nota.munDest : nota.munEmit;
+    const anoCen = ano() >= 2027 ? (ano() >= 2033 ? 2033 : 2027) : 2033;
+    const c = CENARIOS[anoCen]; $('#data').value = c.data;
+    if (c.aliq) [$('#aCbs').value,$('#aIbsUf').value,$('#aIbsMun').value] = c.aliq;
+    atualizarAliqUI();
+    $('#uf').value = uf; await carregarMunicipios(mun);
+    $('#munHint').textContent = usaDest ? 'Preenchido com o município do destinatário da nota.' : 'Preenchido com o município do emitente (nota sem destinatário no Brasil).';
+    await carregarClassificacoes();
+
+    const gerais = [];
+    if (nota.crt === '1' || nota.crt === '4') gerais.push('O emitente é do Simples Nacional (CRT '+nota.crt+'). Esta calculadora simula o regime regular.');
+    if (nota.idDest === '3') gerais.push('Operação com o exterior: confira imunidade/suspensão.');
+
+    $('#itens').innerHTML = '';
+    for (const n of nota.itens){
+      const flags = flagsCfop(n.cfop);
+      const sug = await sugerirClassificacao(n.ncm);
+      let ccl = '000001';
+      const reduz = sug.filter(c=>CCL_SUGERIVEIS.includes(c));
+      if (reduz.length){
+        ccl = reduz[0];
+        const d = cclDetalhe[ccl];
+        flags.push(`A NCM ${n.ncm} consta na lista de <b>${esc(d.descricao)}</b> (${esc(d.descricaoTratamentoTributario)}). Sugeri esta classificação: confirme se o produto se enquadra.` +
+          (reduz.length>1 ? ` Outras possíveis: ${reduz.slice(1).map(c=>c+' – '+esc(cclDetalhe[c].descricao)).join('; ')}.` : ''));
+      }
+      sug.filter(c=>CCL_ALERTA[c]).forEach(c=>flags.push(CCL_ALERTA[c]));
+      const info = await infoCodigo('ncm', n.ncm);
+      const valorItem = r2(n.vProd + n.vFrete + n.vSeg + n.vOutro - n.vDesc);
+      let is;
+      if (info?.tributadoPeloImpostoSeletivo){
+        is = { cst:'000', cClassTrib:'000001', baseCalculo: valorItem };
+        flags.push('Produto sujeito ao Imposto Seletivo: informe a alíquota do IS (ad valorem e/ou ad rem).');
+      }
+      const {base, txt} = await baseDaNota(n, ano());
+      const el = addItem({ ncm:n.ncm, cClassTrib:ccl, cst:cclParaCst[ccl], baseCalculo: is ? '' : base,
+        quantidade:n.qCom || '', unidade:(n.uCom||'').toUpperCase().slice(0,6), is, nota:n, flags });
+      if (!is){ el.dataset.baseTxt = txt; atualizarBaseHint(el); }
+      else el.dataset.baseManual = '1';
+    }
+    const totAt = r2(nota.itens.reduce((s,n)=>s+tributosAtuais(n),0));
+    $('#notaInfo').innerHTML = `<div class="nota">
+      <div><span>Nota:</span> ${nota.modelo==='65'?'NFC-e':'NF-e'} nº ${esc(nota.numero)} série ${esc(nota.serie)}</div>
+      <div><span>Emissão:</span> ${esc(nota.emissao.split('-').reverse().join('/'))}</div>
+      <div><span>Emitente:</span> ${esc(nota.emitente)} (${esc(nota.ufEmit)})</div>
+      <div><span>Destinatário:</span> ${esc(nota.destinatario||'—')} ${nota.ufDest?'('+esc(nota.ufDest)+')':''}</div>
+      <div><span>Natureza:</span> ${esc(nota.natOp)}</div>
+      <div><span>Itens:</span> ${nota.itens.length} · tributos atuais destacados R$ ${fmt(totAt)}</div></div>`;
+    const nRev = document.querySelectorAll('#itens .flags .notice').length;
+    $('#revisao').innerHTML = (gerais.length || nRev) ? `<div class="notice warn">${gerais.map(g=>esc(g)+'<br>').join('')}${nRev?`<b>${nRev} item(ns) com ponto de revisão</b> (em amarelo abaixo). `:''}As classificações são sugestões: confira antes de usar o resultado.</div>`
+      : `<div class="notice info">Todos os itens foram classificados como tributação integral (CST 000 / cClassTrib 000001). Se algum tiver redução ou benefício, ajuste abaixo.</div>`;
+    salvar();
+    await calcular();
+  } finally { document.body.classList.remove('loading'); }
 }
 
 /* ---------- montar entrada ---------- */
@@ -332,22 +578,22 @@ function montarEntrada(){
   });
   return {
     id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).replace(/-/g,''),
-    versao:'1.0.0',
-    dhFatoGerador: dataISO()+'T12:00:00-03:00',
+    versao:'1.0.0', dhFatoGerador: dataISO()+'T12:00:00-03:00',
     municipio: Number($('#mun').value), uf: $('#uf').value, itens
   };
 }
+function notasDosItens(){ return [...document.querySelectorAll('#itens .item')].map(el=>el.dataset.nota ? JSON.parse(el.dataset.nota) : null); }
 
 /* ---------- calcular ---------- */
 async function calcular(){
   const entrada = montarEntrada();
   if (!entrada.itens.length){ $('#status').textContent='Adicione pelo menos um item.'; return; }
+  if (!entrada.municipio){ $('#status').textContent='Escolha a UF e o município.'; return; }
   $('#status').textContent='Calculando…'; document.body.classList.add('loading');
   try{
-    const r = await fetch(`${API}/observabilidade/regime-geral`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entrada)});
-    const txt = await r.text(); let corpo; try{ corpo = JSON.parse(txt);}catch{ corpo = {detail:txt}; }
-    ultimaEntrada = entrada; ultimaResposta = r.ok ? corpo : null;
-    mostrarResultado(entrada, corpo, r.ok, r.headers.get('x-warning-dados-simulados'));
+    const r = await post('observabilidade/regime-geral', entrada);
+    ultimaEntrada = entrada; ultimaResposta = r.ok ? r.body : null;
+    mostrarResultado(entrada, r.body, r.ok, notasDosItens());
     $('#status').textContent = '';
   }catch(e){
     $('#status').textContent = 'Falha ao chamar a calculadora: '+e.message;
@@ -359,11 +605,16 @@ const ESTADOS = {
   INCONSISTENCIA_ENTRADA:['err','Erro nos dados'], NAO_IMPLEMENTADO:['err','Não implementado'], FALHA_TECNICA:['err','Falha técnica']
 };
 function badge(estado){ const [c,t] = ESTADOS[estado]||['sim',estado||'—']; return `<span class="badge ${c}">${esc(t)}</span>`; }
+function novosDoItem(o){
+  const g = o.tribCalc?.IBSCBS?.gIBSCBS, is = o.tribCalc?.IS;
+  const cbs = +(g?.gCBS?.vCBS||0), ibs = +(g?.vIBS||0), vis = +(is?.vIS||0);
+  return { cbs, ibs, is:vis, total: r2(cbs+ibs+vis) };
+}
 
-function mostrarResultado(entrada, res, ok, avisoSim){
+function mostrarResultado(entrada, res, ok, notas){
   $('#resultado').hidden = false;
   $('#jsonTec').textContent = 'ENVIADO:\n'+JSON.stringify(entrada,null,2)+'\n\nRECEBIDO:\n'+JSON.stringify(res,null,2);
-  const av = $('#resAviso'); av.innerHTML='';
+  const av = $('#resAviso'); av.innerHTML=''; $('#comparativo').innerHTML='';
   if (!ok){
     const erros = res.erros || res.errors || [];
     av.innerHTML = `<div class="notice err"><b>${esc(res.title||'Erro')}</b>: ${esc(res.detail||'')}${erros.map(e=>'<br>• '+esc(e.detail||e.message||JSON.stringify(e))).join('')}</div>`;
@@ -376,37 +627,66 @@ function mostrarResultado(entrada, res, ok, avisoSim){
   const algumErro = objs.some(o=>o.erros?.length);
   $('#btnXml').disabled = algumErro;
   if (objs.some(o=>o.estadoItem==='CALCULO_SIMULADO'))
-    av.innerHTML += `<div class="notice warn">Cálculo <b>simulado</b>: foi feito com as alíquotas que você informou, e não com alíquotas oficiais.</div>`;
+    av.innerHTML += `<div class="notice warn">Cálculo <b>simulado</b>: feito com as alíquotas informadas no cenário ${ano()}, e não com alíquotas oficiais definitivas.</div>`;
   if (algumErro) av.innerHTML += `<div class="notice err">Alguns itens têm erro e ficaram de fora dos totais. Veja o detalhe abaixo.</div>`;
 
   const t = res.total?.tribCalc||{}, ib = t.IBSCBSTot||{};
   const vCBS = +(ib.gCBS?.vCBS||0), vIBS = +(ib.gIBS?.vIBS||0), vIS = +(t.ISTot?.vIS||0), vBC = +(ib.vBCIBSCBS||0);
-  const total = vCBS+vIBS+vIS;
+  const total = r2(vCBS+vIBS+vIS);
+
+  const temNota = notas.some(Boolean);
+  if (temNota){
+    let atual = 0, valor = 0, novo = 0;
+    const comp = { ICMS:0, 'ICMS-ST':0, FCP:0, 'ICMS/FCP UF destino':0, PIS:0, COFINS:0, IPI:0, ISS:0 };
+    objs.forEach(o=>{
+      const n = notas[o.nObj-1]; if (!n || o.erros?.length) return;
+      atual += tributosAtuais(n); valor += n.vProd + n.vFrete + n.vSeg + n.vOutro - n.vDesc; novo += novosDoItem(o).total;
+      comp.ICMS += n.vICMS + n.vICMSMono; comp['ICMS-ST'] += n.vICMSST; comp.FCP += n.vFCP + n.vFCPST;
+      comp['ICMS/FCP UF destino'] += n.vICMSUFDest + n.vFCPUFDest; comp.PIS += n.vPIS; comp.COFINS += n.vCOFINS; comp.IPI += n.vIPI; comp.ISS += n.vISSQN;
+    });
+    const dif = r2(novo - atual), a = ano();
+    const pc = r2(comp.PIS + comp.COFINS);
+    const transicao = a < 2033 ? `<div class="notice info">Atenção: em ${a} o ICMS${a>=2029?' (reduzido)':''} e o ISS ainda existem junto com a CBS/IBS${a>=2027?`, mas PIS e COFINS já foram extintos. Comparando só o que a CBS substitui: PIS + COFINS de hoje R$ ${fmt(pc)} × CBS R$ ${fmt(vCBS)}`:''}. Para ver a substituição completa, use o cenário 2033.</div>` : '';
+    $('#comparativo').innerHTML = `
+      <div class="compare">
+        <div class="tile old"><div class="k">Hoje · tributos destacados na nota</div><div class="v">R$ ${fmt(atual)}</div>
+          <div class="s">${Object.entries(comp).filter(([,v])=>v>0.004).map(([k,v])=>`${k} R$ ${fmt(v)}`).join(' · ') || 'nenhum'}</div>
+          <div class="s">${valor? fmtPct((atual/valor*100).toFixed(2))+' do valor dos itens' : ''}</div></div>
+        <div class="tile total"><div class="k">Na reforma (${a}) · CBS + IBS + IS</div><div class="v">R$ ${fmt(novo)}</div>
+          <div class="s">CBS R$ ${fmt(vCBS)} · IBS R$ ${fmt(vIBS)}${vIS?' · IS R$ '+fmt(vIS):''}</div>
+          <div class="s">${valor? fmtPct((novo/valor*100).toFixed(2))+' do valor dos itens' : ''} · diferença <b class="${dif>0?'up':'down'}">${dif>0?'+':''}R$ ${fmt(dif)}</b></div></div>
+      </div>${transicao}
+      <div class="notice info">Comparação simples dos valores destacados. Hoje ICMS, PIS e COFINS estão embutidos no preço; CBS e IBS são cobrados "por fora", sobre o valor sem esses tributos. Créditos e regime de apuração (Lucro Real/Presumido) não entram nesta conta.</div>`;
+  }
+
   $('#tiles').innerHTML = `
     <div class="tile"><div class="k">Base de cálculo CBS/IBS</div><div class="v">R$ ${fmt(vBC)}</div></div>
     <div class="tile cbs"><div class="k">CBS (federal)</div><div class="v">R$ ${fmt(vCBS)}</div></div>
     <div class="tile ibs"><div class="k">IBS (UF R$ ${fmt(ib.gIBS?.gIBSUF?.vIBSUF)} + Mun. R$ ${fmt(ib.gIBS?.gIBSMun?.vIBSMun)})</div><div class="v">R$ ${fmt(vIBS)}</div></div>
     <div class="tile is"><div class="k">Imposto Seletivo</div><div class="v">R$ ${fmt(vIS)}</div></div>
-    <div class="tile total"><div class="k">Total de tributos${vBC? ' · '+fmtPct((total/vBC*100).toFixed(2))+' da base':''}</div><div class="v">R$ ${fmt(total)}</div></div>`;
+    <div class="tile total"><div class="k">Total novos tributos${vBC? ' · '+fmtPct((total/vBC*100).toFixed(2))+' da base':''}</div><div class="v">R$ ${fmt(total)}</div></div>`;
 
   const linhas = objs.map(o=>{
-    const it = entrada.itens[o.nObj-1]||{}, g = o.tribCalc?.IBSCBS?.gIBSCBS, is = o.tribCalc?.IS;
-    return `<tr><td>${o.nObj}. ${esc(it.ncm||it.nbs||'')} <span class="muted">${esc(it.cClassTrib||'')}</span></td><td>${badge(o.estadoItem)}</td>
-      <td>${fmt(g?.vBC)}</td><td>${fmt(g?.gCBS?.vCBS)}</td><td>${fmt(g?.gIBSUF?.vIBSUF)}</td><td>${fmt(g?.gIBSMun?.vIBSMun)}</td><td>${fmt(is?.vIS)}</td></tr>`;
+    const it = entrada.itens[o.nObj-1]||{}, g = o.tribCalc?.IBSCBS?.gIBSCBS, is = o.tribCalc?.IS, n = notas[o.nObj-1], nv = novosDoItem(o);
+    const desc = n ? esc(n.xProd.length>34 ? n.xProd.slice(0,33)+'…' : n.xProd) : esc(it.ncm||it.nbs||'');
+    return `<tr><td>${o.nObj}. ${desc} <span class="muted">${esc(it.cClassTrib||'')}</span></td><td>${badge(o.estadoItem)}</td>
+      ${temNota?`<td>${n?fmt(tributosAtuais(n)):'—'}</td>`:''}
+      <td>${fmt(g?.vBC)}</td><td>${fmt(g?.gCBS?.vCBS)}</td><td>${fmt(g?.vIBS)}</td><td>${fmt(is?.vIS)}</td>
+      ${temNota?`<td><b>${o.erros?.length?'—':fmt(nv.total)}</b></td>`:''}</tr>`;
   }).join('');
-  $('#tabela').innerHTML = `<table><thead><tr><th>Item</th><th>Situação</th><th>Base (R$)</th><th>CBS</th><th>IBS UF</th><th>IBS Mun.</th><th>IS</th></tr></thead><tbody>${linhas}</tbody></table>`;
+  $('#tabela').innerHTML = `<table><thead><tr><th>Item</th><th>Situação</th>${temNota?'<th>Tributos hoje</th>':''}<th>Base (R$)</th><th>CBS</th><th>IBS</th><th>IS</th>${temNota?'<th>Novos tributos</th>':''}</tr></thead><tbody>${linhas}</tbody></table>`;
 
   $('#detalhes').innerHTML = objs.map(o=>{
-    const it = entrada.itens[o.nObj-1]||{}, ibs = o.tribCalc?.IBSCBS, g = ibs?.gIBSCBS, is = o.tribCalc?.IS;
+    const it = entrada.itens[o.nObj-1]||{}, ibs = o.tribCalc?.IBSCBS, g = ibs?.gIBSCBS, is = o.tribCalc?.IS, n = notas[o.nObj-1];
     const cd = cclDetalhe[it.cClassTrib];
-    let h = `<div class="res-item"><h3>Item ${o.nObj} ${badge(o.estadoItem)}</h3>
+    let h = `<div class="res-item"><h3>Item ${o.nObj}${n?' · '+esc(n.xProd):''} ${badge(o.estadoItem)}</h3>
       <div class="sub">${it.ncm?'NCM '+esc(it.ncm):it.nbs?'NBS '+esc(it.nbs):''} · CST ${esc(it.cst)} · cClassTrib ${esc(it.cClassTrib)}${cd?' – '+esc(cd.descricao):''}</div>`;
     if (o.erros?.length) h += o.erros.map(e=>`<div class="notice err"><b>${esc(e.code)} · ${esc(e.title)}</b><br>${esc(e.detail)}</div>`).join('');
     const memos = [];
     if (g){
       const lin = (nome, aliq, red, val, memo)=>{ if(memo) memos.push(`<li><b>${nome}:</b> ${esc(memo)}</li>`);
         return `<tr><td>${nome}</td><td>${fmtPct(aliq)}</td><td>${red?fmtPct(red.pRedAliq):'—'}</td><td>${fmtPct(red?red.pAliqEfet:aliq)}</td><td>${fmt(val)}</td></tr>`; };
-      h += `<div class="tbl"><table><thead><tr><th>Tributo (base R$ ${fmt(g.vBC)})</th><th>Alíquota</th><th>Redução</th><th>Alíq. efetiva</th><th>Valor (R$)</th></tr></thead><tbody>
+      h += `<div class="tbl"><table><thead><tr><th>Tributo novo (base R$ ${fmt(g.vBC)})</th><th>Alíquota</th><th>Redução</th><th>Alíq. efetiva</th><th>Valor (R$)</th></tr></thead><tbody>
         ${lin('CBS', g.gCBS?.pCBS, g.gCBS?.gRed, g.gCBS?.vCBS, g.gCBS?.memoriaCalculo)}
         ${lin('IBS estadual', g.gIBSUF?.pIBSUF, g.gIBSUF?.gRed, g.gIBSUF?.vIBSUF, g.gIBSUF?.memoriaCalculo)}
         ${lin('IBS municipal', g.gIBSMun?.pIBSMun, g.gIBSMun?.gRed, g.gIBSMun?.vIBSMun, g.gIBSMun?.memoriaCalculo)}
@@ -415,6 +695,10 @@ function mostrarResultado(entrada, res, ok, avisoSim){
       if (is?.memoriaCalculo) memos.push(`<li><b>IS:</b> ${esc(is.memoriaCalculo)}</li>`);
     } else if (ibs && !o.erros?.length){
       h += `<div class="muted">Sem destaque de CBS/IBS para esta classificação.</div>`;
+    }
+    if (n){
+      const at = [['ICMS',n.vICMS+n.vICMSMono],['ICMS-ST',n.vICMSST],['FCP',n.vFCP+n.vFCPST],['ICMS/FCP UF destino',n.vICMSUFDest+n.vFCPUFDest],['PIS',n.vPIS],['COFINS',n.vCOFINS],['IPI',n.vIPI],['ISS',n.vISSQN]].filter(([,v])=>v>0.004);
+      h += `<div class="sub" style="margin-top:8px">Na nota: valor R$ ${fmt(n.vProd)}${n.vDesc?' · desconto R$ '+fmt(n.vDesc):''}${n.vFrete?' · frete R$ '+fmt(n.vFrete):''} · tributos de hoje: ${at.length?at.map(([k,v])=>`${k} R$ ${fmt(v)}`).join(', '):'nenhum destacado'} (total R$ ${fmt(tributosAtuais(n))})</div>`;
     }
     if (memos.length) h += `<details><summary>Memória de cálculo</summary><ul class="memo">${memos.join('')}</ul></details>`;
     return h + '</div>';
@@ -436,10 +720,10 @@ $('#btnXml').onclick = async ()=>{
     const x = await fetch(`${API}/xml/generate?tipo=nfe`, {method:'POST', headers:{'Content-Type':'application/json'}, body: await r.text()});
     if (!x.ok) throw new Error('geração do XML falhou ('+x.status+')');
     baixar('grupo-tributacao-nfe.xml', await x.text(), 'application/xml');
-  }catch(e){ alert('Não foi possível gerar o XML: '+e.message); }
+  }catch(e){ $('#status').textContent = 'Não foi possível gerar o XML: '+e.message; }
 };
 
-/* ---------- exemplo / persistência ---------- */
+/* ---------- exemplo / limpar / persistência ---------- */
 const EXEMPLO = {
   data:'2027-03-10', uf:'RS', mun:'4314902', aliq:[8.8,0.05,0.05],
   itens:[
@@ -449,38 +733,54 @@ const EXEMPLO = {
   ]
 };
 async function aplicar(cfg){
-  $('#data').value = cfg.data; atualizarAliqUI();
-  [$('#aCbs').value,$('#aIbsUf').value,$('#aIbsMun').value] = cfg.aliq || [8.8,0.05,0.05];
-  $('#uf').value = cfg.uf; await carregarMunicipios(cfg.mun);
+  notaAtual = null; $('#notaInfo').innerHTML=''; $('#revisao').innerHTML=''; $('#munHint').textContent='';
+  $('#data').value = cfg.data || CENARIOS[2027].data;
+  [$('#aCbs').value,$('#aIbsUf').value,$('#aIbsMun').value] = cfg.aliq || CENARIOS[2027].aliq;
+  atualizarAliqUI();
+  $('#uf').value = cfg.uf || ''; await carregarMunicipios(cfg.mun);
   await carregarClassificacoes();
-  $('#itens').innerHTML=''; (cfg.itens.length?cfg.itens:[{}]).forEach(addItem);
-  salvar();
+  $('#itens').innerHTML=''; (cfg.itens?.length ? cfg.itens : [{}]).forEach(addItem);
+  mostrarFormulario(); salvar();
+}
+async function limpar(){
+  try{ localStorage.removeItem('simuladorRTC2'); }catch{}
+  notaAtual = null; $('#itens').innerHTML=''; $('#notaInfo').innerHTML=''; $('#revisao').innerHTML='';
+  ['#secOperacao','#secItens','#resultado'].forEach(s=>$(s).hidden=true);
+  $('#arqXml').value=''; window.scrollTo({top:0,behavior:'smooth'});
 }
 function estadoAtual(){
   return { data:$('#data').value, uf:$('#uf').value, mun:$('#mun').value, aliq:[$('#aCbs').value,$('#aIbsUf').value,$('#aIbsMun').value],
     itens:[...document.querySelectorAll('#itens .item')].map(el=>{
       const q=s=>el.querySelector(s).value; const v={cst:q('.cst'), cClassTrib:q('.ccl'), baseCalculo:q('.base'), quantidade:q('.qtd'), unidade:q('.un')};
       v[el.dataset.tipo]=q('.cod');
+      if (el.dataset.nota) v.nota = JSON.parse(el.dataset.nota);
       if (el.querySelector('.temIs').checked) v.is={cst:q('.isCst'), cClassTrib:q('.isCcl'), baseCalculo:q('.isBase'), adValorem:q('.isAliq'), adRem:q('.isAdRem'), impostoInformado:q('.isInf')};
       return v; }) };
 }
 let tmrSalvar;
-function salvar(){ clearTimeout(tmrSalvar); tmrSalvar=setTimeout(()=>{ try{ localStorage.setItem('simuladorRTC', JSON.stringify(estadoAtual())); }catch{} },300); }
+function salvar(){ clearTimeout(tmrSalvar); tmrSalvar=setTimeout(()=>{ try{ localStorage.setItem('simuladorRTC2', JSON.stringify(estadoAtual())); }catch{} },300); }
 
 $('#btnAdd').onclick = ()=>{ addItem({}); salvar(); };
 $('#btnCalcular').onclick = calcular;
 $('#btnExemplo').onclick = ()=>aplicar(EXEMPLO);
-$('#btnLimpar').onclick = ()=>aplicar({data:new Date().toISOString().slice(0,10), uf:$('#uf').value||'SP', mun:'', itens:[]});
+$('#btnManual').onclick = ()=>aplicar({data:CENARIOS[2027].data, aliq:CENARIOS[2027].aliq, itens:[]});
+$('#btnLimpar').onclick = limpar;
+$('#arqXml').onchange = e => importarArquivo(e.target.files[0]);
+const dz = $('#dropZone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', e=>importarArquivo(e.dataTransfer.files[0]));
+document.querySelectorAll('#cenarios button').forEach(b=>b.onclick=()=>aplicarCenario(Number(b.dataset.ano)));
 $('#uf').onchange = ()=>{ carregarMunicipios(); salvar(); };
 $('#mun').onchange = salvar;
 ['#aCbs','#aIbsUf','#aIbsMun'].forEach(s=>$(s).oninput=salvar);
-$('#data').onchange = ()=>{ atualizarAliqUI(); carregarClassificacoes(); salvar(); };
+$('#data').onchange = async ()=>{ atualizarAliqUI(); await carregarClassificacoes(); await recalcularBasesNota(); salvar(); };
 
 (async function init(){
   try{
     await carregarUfs();
-    let cfg = null; try{ cfg = JSON.parse(localStorage.getItem('simuladorRTC')); }catch{}
-    await aplicar(cfg && cfg.itens ? cfg : EXEMPLO);
+    let cfg = null; try{ cfg = JSON.parse(localStorage.getItem('simuladorRTC2')); }catch{}
+    if (cfg && cfg.itens?.length && cfg.itens.some(i=>i.ncm||i.nbs||i.baseCalculo)) await aplicar(cfg);
   }catch(e){
     $('#msgApi').innerHTML = `<div class="notice err">Não consegui falar com a calculadora (${esc(e.message)}). Abra esta página pelo INICIAR.bat, com a janela preta aberta.</div>`;
   }
